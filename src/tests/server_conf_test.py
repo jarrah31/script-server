@@ -358,6 +358,23 @@ class TestSecurityConfig(unittest.TestCase):
             'xsrf_protection': 'something'
         }})
 
+    @parameterized.expand([
+        (None, False, False),
+        (None, True, True),
+        (True, False, True),
+        (False, True, False),
+    ])
+    def test_cookie_secure(self, cookie_secure, ssl_enabled, expected_cookie_secure):
+        body = {}
+        if cookie_secure is not None:
+            body['security'] = {'cookie_secure': cookie_secure}
+        if ssl_enabled:
+            body['ssl'] = {'key_path': 'some_key', 'cert_path': 'some_cert'}
+
+        config = _from_json(body)
+
+        self.assertEqual(expected_cookie_secure, config.cookie_secure)
+
     def setUp(self) -> None:
         super().setUp()
         test_utils.setup()
